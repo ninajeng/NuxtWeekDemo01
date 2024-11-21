@@ -5,4 +5,5 @@ export default defineNuxtConfig({
   app: {
     baseURL: "/NuxtWeekDemo01/",
   },
+  css: ["~/assets/stylesheets/all.scss"],
 });
