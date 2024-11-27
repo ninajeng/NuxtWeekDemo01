@@ -9,6 +9,7 @@ export default defineNuxtConfig({
         lang: "zh-Hant-TW",
       },
       title: "享樂酒店｜Enjoyment Luxury Hotel",
+      link: [{ rel: "icon", type: "image/png", href: "/favicon.png" }],
     },
   },
   css: ["~/assets/stylesheets/all.scss"],
