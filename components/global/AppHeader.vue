@@ -55,7 +55,9 @@ onUnmounted(() => {
                 </button>
                 <ul class="dropdown-menu py-3 overflow-hidden" style="right: 0; left: auto; border-radius: 20px;">
                   <li>
-                    <a class="dropdown-item px-6 py-4" href="#">我的帳戶</a>
+                    <NuxtLink to="/user/1/profile" class="dropdown-item px-6 py-4">
+                      我的帳戶
+                    </NuxtLink>
                   </li>
                   <li>
                     <a class="dropdown-item px-6 py-4" href="#">登出</a>
@@ -64,7 +66,7 @@ onUnmounted(() => {
               </div>
             </li>
             <li class="d-md-none nav-item">
-              <NuxtLink to="/" class="nav-link p-4 text-neutral-0">
+              <NuxtLink to="/account/login" class="nav-link p-4 text-neutral-0">
                 會員登入
               </NuxtLink>
             </li>
