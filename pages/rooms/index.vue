@@ -10,10 +10,10 @@ import 'swiper/css/pagination';
 
 const modules = ref([Autoplay, Navigation, Pagination]);
 
-const importImage = (url) => {
-  const image = new URL(url, import.meta.url);
-  return image.href;
-}
+// const importImage = (url) => {
+//   const image = new URL(url, import.meta.url);
+//   return image.href;
+// }
 
 const roomImages = computed(() => {
   const rooms = ['a', 'b', 'c', 'd'];
@@ -22,8 +22,9 @@ const roomImages = computed(() => {
   const result = rooms.reduce((acc, roomId) => {
     acc[`room${roomId.toUpperCase()}`] = nums.reduce((obj, num) => {
       obj[num] = {
-        desktop: importImage(`../../assets/images/room-${roomId}-${num}.png`),
-        mobile: importImage(`../../assets/images/room-${roomId}-sm-${num}.png`)
+        // 暫時使用 public/images，避免 hydration mismatch 問題 
+        desktop: `/images/room-${roomId}-${num}.png`,
+        mobile: `/images/room-${roomId}-sm-${num}.png`
       };
       return obj;
     }, {});
