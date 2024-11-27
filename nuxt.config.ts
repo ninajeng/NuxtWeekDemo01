@@ -3,7 +3,7 @@ export default defineNuxtConfig({
   compatibilityDate: "2024-11-01",
   devtools: { enabled: true },
   app: {
-    baseURL: "/NuxtWeekDemo01/",
+    baseURL: "/",
     head: {
       htmlAttrs: {
         lang: "zh-Hant-TW",
