@@ -8,6 +8,7 @@ export default defineNuxtConfig({
       htmlAttrs: {
         lang: "zh-Hant-TW",
       },
+      title: "享樂酒店｜Enjoyment Luxury Hotel",
     },
   },
   css: ["~/assets/stylesheets/all.scss"],
