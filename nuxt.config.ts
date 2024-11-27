@@ -4,6 +4,11 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   app: {
     baseURL: "/NuxtWeekDemo01/",
+    head: {
+      htmlAttrs: {
+        lang: "zh-Hant-TW",
+      },
+    },
   },
   css: ["~/assets/stylesheets/all.scss"],
 });
