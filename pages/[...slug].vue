@@ -9,7 +9,7 @@ setResponseStatus(event, 404);
 <template>
   <div class="not-found">
     <h1>404 - 找不到頁面</h1>
-    <p>抱歉，您所尋找的 "{{ page }}"" 頁面不存在。</p>
+    <p>抱歉，您所尋找的 "{{ page }}" 頁面不存在。</p>
     <NuxtLink class="btn btn-primary-100 px-8 py-4 text-white fw-bold border-0 rounded-3" to="/">返回首頁</NuxtLink>
   </div>
 </template>
