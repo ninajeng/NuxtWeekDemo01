@@ -13,4 +13,7 @@ export default defineNuxtConfig({
     },
   },
   css: ["~/assets/stylesheets/all.scss"],
+  typescript: {
+    typeCheck: true,
+  },
 });
