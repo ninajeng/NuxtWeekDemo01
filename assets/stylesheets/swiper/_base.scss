@@ -1,0 +1,16 @@
+.swiper :deep(.swiper-pagination) {
+  bottom: 24px;
+}
+
+.swiper :deep(.swiper-pagination-bullet) {
+  width: 32px;
+  height: 4px;
+  background-color: #f1eae4;
+  border-radius: 100px;
+  opacity: 1;
+}
+
+.swiper :deep(.swiper-pagination-bullet-active) {
+  width: 60px;
+  background-color: #bf9d7d;
+}
