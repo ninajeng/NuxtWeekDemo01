@@ -16,4 +16,22 @@ export default defineNuxtConfig({
   typescript: {
     typeCheck: true,
   },
+  modules: ["@vee-validate/nuxt", "@pinia/nuxt"],
+  veeValidate: {
+    // 啟用 auto imports
+    autoImports: true,
+    // 更換 components 名稱
+    componentNames: {
+      Form: "VeeForm",
+      Field: "VeeField",
+      FieldArray: "VeeFieldArray",
+      ErrorMessage: "VeeErrorMessage",
+    },
+  },
+  runtimeConfig: {
+    public: {
+      cookieToken: "EL-Hotel",
+      cookieAccount: "EL-Account",
+    },
+  },
 });
