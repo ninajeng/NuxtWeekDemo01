@@ -1,6 +1,10 @@
 <script setup>
 const isEditPassword = ref(false);
 const isEditProfile = ref(false);
+
+const userStore = useUserStore();
+const { userInfo } = storeToRefs(userStore);
+console.log(userInfo)
 </script>
 
 <template>
@@ -15,7 +19,7 @@ const isEditProfile = ref(false);
             <p class="mb-2 text-neutral-80 fw-medium">
               電子信箱
             </p>
-            <span class="form-control pe-none p-0 text-neutral-100 fw-bold border-0">Jessica@exsample.com</span>
+            <span class="form-control pe-none p-0 text-neutral-100 fw-bold border-0">{{ userInfo.email }}</span>
           </div>
 
           <div class="d-flex justify-content-between align-items-center" :class="{ 'd-none': isEditPassword }">
@@ -73,7 +77,8 @@ const isEditProfile = ref(false);
               姓名
             </label>
             <input id="name" name="name" class="form-control text-neutral-100 fw-bold"
-              :class="{ 'pe-none p-0 border-0': !isEditProfile, 'p-4': isEditProfile }" type="text" value="Jessica Ｗang">
+              :class="{ 'pe-none p-0 border-0': !isEditProfile, 'p-4': isEditProfile }" type="text"
+              :value="userInfo.name">
           </div>
 
           <div class="fs-8 fs-md-7">
@@ -84,7 +89,7 @@ const isEditProfile = ref(false);
             </label>
             <input id="phone" name="phone" class="form-control text-neutral-100 fw-bold"
               :class="{ 'pe-none p-0 border-0': !isEditProfile, 'p-4': isEditProfile }" type="tel"
-              value="+886 912 345 678">
+              :value="userInfo.phone">
           </div>
 
           <div class="fs-8 fs-md-7">
