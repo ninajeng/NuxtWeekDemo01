@@ -112,7 +112,7 @@ const clearDate = () => {
 </script>
 
 <template>
-  <div id="dateModal" class="modal fade" tabindex="-1" aria-hidden="true">
+  <div id="dateModal" class="modal fade">
     <div class="modal-dialog modal-dialog-centered m-0 mt-9 mx-md-auto">
       <div :class="{ 'mt-auto': isConfirmDateOnMobile }" class="modal-content gap-6 gap-md-10 rounded-3xl">
         <div class="d-md-none modal-header px-6 py-4 bg-neutral-40">
