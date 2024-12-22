@@ -26,3 +26,8 @@ export type TRooms = {
   status: boolean;
   result: TRoomResult[];
 };
+
+export type TRoom = {
+  status: boolean;
+  result: TRoomResult;
+};

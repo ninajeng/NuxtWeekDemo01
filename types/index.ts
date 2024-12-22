@@ -1,3 +1,5 @@
 export * from "./News";
-export * from "./Restaurant";
+export * from "./Restaurants";
 export * from "./Rooms";
+
+export * from "./EmailVerify";
