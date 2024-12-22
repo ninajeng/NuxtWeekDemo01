@@ -1,10 +1,193 @@
 <script setup>
 import { Icon } from '@iconify/vue';
 
+import { verifyEmail } from '@/api/emailVerify';
+import { signup } from '@/api/signup';
+
 const isEmailAndPasswordValid = ref(false);
+
+// DOM
+const alertDialog = ref(null)
+const yearSelect = ref(null)
+const monthSelect = ref(null)
+const dateSelect = ref(null)
+const citySelect = ref(null)
+const zoneSelect = ref(null)
+
+const backupData = ref({})
+
+const labelAppendix = ref({
+  email: 'E-mail',
+  password: '密碼',
+})
+
+const delaySecondTime = 5;
+const pageRedirectSetting = {
+  message: `${delaySecondTime} 秒後導向登入頁`,
+  replacePath: '/account/login',
+  timer: delaySecondTime * 1000
+}
+
+const verifyEmailAndPassword = async (inputValue) => {
+  const email = inputValue[labelAppendix.value.email];
+  const password = inputValue[labelAppendix.value.password];
+  const confirmPassword = inputValue.confirmPassword;
+
+  const { status, result, message: errorMessage } = await verifyEmail(email)
+
+  if (!status) {
+    if (errorMessage) {
+      alertDialog.value.showErrorMessage({ message: errorMessage })
+    } else {
+      alertDialog.value.showErrorMessage()
+    }
+    return
+  }
+
+  if (result.isEmailExists) {
+    const message = {
+      title: '帳號已存在',
+      ...pageRedirectSetting
+    }
+    alertDialog.value.showErrorMessage(message)
+  } else {
+    backupData.value = {
+      email, password, confirmPassword
+    }
+    isEmailAndPasswordValid.value = true
+  }
+};
+
+const phoneRegex = new RegExp('^09\\d{8}$');
+const checkPhone = (phone) => phoneRegex.test(phone);
+
+const dayCount = ref(31);
+const checkCalender = () => {
+  const year = yearSelect.value.value;
+  const month = monthSelect.value.value;
+  const dateDOM = dateSelect.value;
+  dayCount.value = new Date(year, month, 0).getDate();
+  if (dateDOM.value > dayCount.value) {
+    dateDOM.value = 1;
+  }
+}
+
+const cityZoneList = ref({
+  Taipei: {
+    name: '臺北市',
+    zones: [
+      {
+        name: '中山區',
+        zipCode: 104
+      },
+      {
+        name: '松山區',
+        zipCode: 105
+      },
+      {
+        name: '信義區',
+        zipCode: 110
+      }
+    ]
+  },
+  Taichung: {
+    name: '臺中市',
+    zones: [
+      {
+        name: '中區',
+        zipCode: 400
+      },
+      {
+        name: '豐原區',
+        zipCode: 420
+      },
+      {
+        name: '大甲區',
+        zipCode: 437
+      }
+    ]
+  },
+  Kaohsiung: {
+    name: '高雄市',
+    zones: [
+      {
+        name: '前金區',
+        zipCode: 801
+      },
+      {
+        name: '鹽埕區',
+        zipCode: 803
+      },
+      {
+        name: '新興區',
+        zipCode: 800
+      }
+    ]
+  },
+})
+const zoneOptions = ref([]);
+const cityDefault = ref('Taipei')
+const resetZones = (city) => {
+  const zones = cityZoneList.value[city].zones.map(zone => zone.name)
+  zoneOptions.value = zones;
+  if (zoneSelect.value) {
+    zoneSelect.value.value = 0;
+  }
+}
+resetZones(cityDefault.value)
+
+const register = async (inputValue) => {
+  const { name, phone, year, month, date, city, zoneIndex, addressDetail: detail } = inputValue
+  const birthday = `${year}/${month}/${date}`;
+  const zipcode = cityZoneList.value[city].zones[zoneIndex].zipCode;
+
+  const signupData = {
+    email: backupData.value.email,
+    password: backupData.value.password,
+    name,
+    phone,
+    birthday,
+    address: {
+      zipcode,
+      detail
+    }
+  }
+
+  backupData.value = {
+    ...signupData,
+    ...inputValue,
+    confirmPassword: backupData.value.confirmPassword
+  }
+
+  const { status, result, message: errorMessage } = await signup(signupData);
+
+  if (!status) {
+    if (errorMessage) {
+      const message = {
+        title: '註冊失敗',
+        message: errorMessage
+      }
+      alertDialog.value.showErrorMessage(message)
+    } else {
+      alertDialog.value.showErrorMessage()
+    }
+    isEmailAndPasswordValid.value = false
+    return
+  }
+
+  const message = {
+    title: '註冊成功！',
+    ...pageRedirectSetting
+  }
+  alertDialog.value.showSuccessMessage(message)
+}
+
 </script>
 
 <template>
+  <ClientOnly>
+    <AppAlert ref="alertDialog" />
+  </ClientOnly>
   <div class="p-5 px-md-0 py-md-30">
     <div class="mb-10">
       <p class="mb-2 text-primary-100 fs-8 fs-md-7 fw-bold">
@@ -40,68 +223,98 @@ const isEmailAndPasswordValid = ref(false);
     </div>
 
     <div class="mb-4">
-      <form :class="{ 'd-none': isEmailAndPasswordValid }" class="mb-4">
+      <VeeForm @submit="verifyEmailAndPassword" v-slot="{ meta, errors }" ref="emailForm"
+        :class="{ 'd-none': isEmailAndPasswordValid }">
+        class="mb-4">
         <div class="mb-4 fs-8 fs-md-7">
           <label class="mb-2 text-neutral-0 fw-bold" for="email">
             電子信箱
           </label>
-          <input id="email" class="form-control p-4 text-neutral-100 fw-medium border-neutral-40"
-            placeholder="hello@exsample.com" type="email">
+          <VeeField :name="labelAppendix.email" id="email"
+            class="form-control p-4 text-neutral-100 fw-medium border-neutral-40 mb-1"
+            :class="{ 'is-invalid': errors[labelAppendix.email] }" placeholder="hello@exsample.com" type="email"
+            rules="required|email" :value="backupData.email" />
+          <VeeErrorMessage :name="labelAppendix.email" class="text-danger" />
         </div>
         <div class="mb-4 fs-8 fs-md-7">
           <label class="mb-2 text-neutral-0 fw-bold" for="password">
             密碼
           </label>
-          <input id="password" class="form-control p-4 text-neutral-100 fw-medium border-neutral-40" placeholder="請輸入密碼"
-            type="password">
+          <VeeField :name="labelAppendix.password" id="password"
+            class="form-control p-4 text-neutral-100 fw-medium border-neutral-40 mb-1"
+            :class="{ 'is-invalid': errors[labelAppendix.password] }" placeholder="請輸入密碼" type="password"
+            rules="required|min:8" :value="backupData.password" />
+          <VeeErrorMessage :name="labelAppendix.password">
+            <span class="text-danger">密碼需至少 8 碼以上</span>
+          </VeeErrorMessage>
         </div>
         <div class="mb-10 fs-8 fs-md-7">
           <label class="mb-2 text-neutral-0 fw-bold" for="confirmPassword">
             確認密碼
           </label>
-          <input id="confirmPassword" class="form-control p-4 text-neutral-100 fw-medium border-neutral-40"
-            placeholder="請再輸入一次密碼" type="password">
+          <VeeField name="confirmPassword" id="confirmPassword"
+            class="form-control p-4 text-neutral-100 fw-medium border-neutral-40 mb-1"
+            :class="{ 'is-invalid': errors['confirmPassword'] }" placeholder="請再輸入一次密碼" type="password"
+            :rules="`required|confirmed:@${labelAppendix.password}`" :value="backupData.confirmPassword" />
+          <VeeErrorMessage name="confirmPassword">
+            <span class="text-danger">兩次密碼輸入不相同</span>
+          </VeeErrorMessage>
         </div>
-        <button class="btn btn-neutral-40 w-100 py-4 text-neutral-60 fw-bold" type="button"
-          @click="isEmailAndPasswordValid = true">
+
+        <button class="btn btn-neutral-40 w-100 py-4 text-neutral-60 fw-bold" type="submit" :disabled="!meta.valid">
           下一步
         </button>
-      </form>
-      <form :class="{ 'd-none': !isEmailAndPasswordValid }" class="mb-4">
+      </VeeForm>
+
+      <VeeForm @submit="register" v-slot="{ meta, errors }" :class="{ 'd-none': !isEmailAndPasswordValid }"
+        class="mb-4">
         <div class="mb-4 fs-8 fs-md-7">
           <label class="mb-2 text-neutral-0 fw-bold" for="name">
             姓名
           </label>
-          <input id="name" class="form-control p-4 text-neutral-100 fw-medium border-neutral-40  rounded-3"
-            placeholder="請輸入姓名" type="text">
+          <VeeField name="name" id="name"
+            class="form-control p-4 text-neutral-100 fw-medium border-neutral-40 rounded-3 mb-1"
+            :class="{ 'is-invalid': errors['name'] }" placeholder="請輸入姓名" type="text" rules="required|min:2"
+            :value="backupData.name" />
+          <VeeErrorMessage name="name">
+            <span class="text-danger">姓名需至少 2 個字</span>
+          </VeeErrorMessage>
         </div>
         <div class="mb-4 fs-8 fs-md-7">
           <label class="mb-2 text-neutral-0 fw-bold" for="phone">
             手機號碼
           </label>
-          <input id="phone" class="form-control p-4 text-neutral-100 fw-medium border-neutral-40  rounded-3"
-            placeholder="請輸入手機號碼" type="tel">
+          <VeeField name="phone" id="phone"
+            class="form-control p-4 text-neutral-100 fw-medium border-neutral-40 rounded-3 mb-1"
+            :class="{ 'is-invalid': errors['phone'] }" placeholder="請輸入手機號碼" type="tel" :rules="checkPhone"
+            :value="backupData.phone" />
+          <VeeErrorMessage name="phone">
+            <span class="text-danger">手機格式不正確</span>
+          </VeeErrorMessage>
         </div>
         <div class="mb-4 fs-8 fs-md-7">
           <label class="mb-2 text-neutral-0 fw-bold" for="birth">
             生日
           </label>
           <div class="d-flex gap-2">
-            <select id="birth" class="form-select p-4 text-neutral-80 fw-medium rounded-3">
-              <option v-for="year in 65" :key="year" value="`${year + 1958} 年`">
+            <VeeField name="year" id="birth" class="form-select p-4 text-neutral-80 fw-medium rounded-3" as="select"
+              :value="backupData.year || 1990" @change="checkCalender" ref="yearSelect">
+              <option v-for="year in 65" :key="year" :value="year + 1958">
                 {{ year + 1958 }} 年
               </option>
-            </select>
-            <select class="form-select p-4 text-neutral-80 fw-medium rounded-3">
-              <option v-for="month in 12" :key="month" value="`${month} 月`">
+            </VeeField>
+            <VeeField name="month" class="form-select p-4 text-neutral-80 fw-medium rounded-3" as="select"
+              :value="backupData.month || 1" @change="checkCalender" ref="monthSelect">
+              <option v-for="month in 12" :key="month" :value="month">
                 {{ month }} 月
               </option>
-            </select>
-            <select class="form-select p-4 text-neutral-80 fw-medium rounded-3">
-              <option v-for="day in 30" :key="day" value="`${day} 日`">
-                {{ day }} 日
+            </VeeField>
+            <VeeField name="date" class="form-select p-4 text-neutral-80 fw-medium rounded-3" as="select"
+              :value="backupData.date || 1" ref="dateSelect">
+              <option v-for="date in dayCount" :key="date" :value="date">
+                {{ date }} 日
               </option>
-            </select>
+            </VeeField>
           </div>
         </div>
         <div class="mb-4 fs-8 fs-md-7">
@@ -110,43 +323,44 @@ const isEmailAndPasswordValid = ref(false);
           </label>
           <div>
             <div class="d-flex gap-2 mb-2">
-              <select class="form-select p-4 text-neutral-80 fw-medium rounded-3">
-                <option value="臺北市">
-                  臺北市
+              <VeeField name="city" class="form-select p-4 text-neutral-80 fw-medium rounded-3" ref="citySelect"
+                as="select" :value="backupData.city || cityDefault" @change="resetZones($event.target.value)">
+                <option :value="cityName" v-for="(cityInfo, cityName) in cityZoneList" :key="`city-${cityName}`">
+                  {{ cityInfo.name }}
                 </option>
-                <option value="臺中市">
-                  臺中市
+              </VeeField>
+              <VeeField name="zoneIndex" class="form-select p-4 text-neutral-80 fw-medium rounded-3" ref="zoneSelect"
+                as="select" :value="backupData.zoneIndex | 0">
+                <option :value="index" v-for="(zone, index) in zoneOptions" :key="`zone-${index}`">
+                  {{ zone }}
                 </option>
-                <option selected value="高雄市">
-                  高雄市
-                </option>
-              </select>
-              <select class="form-select p-4 text-neutral-80 fw-medium rounded-3">
-                <option value="前金區">
-                  前金區
-                </option>
-                <option value="鹽埕區">
-                  鹽埕區
-                </option>
-                <option selected value="新興區">
-                  新興區
-                </option>
-              </select>
+              </VeeField>
             </div>
-            <input id="address" type="text" class="form-control p-4 rounded-3" placeholder="請輸入詳細地址">
+            <VeeField name="addressDetail" id="address" type="text" class="form-control p-4 rounded-3 mb-1"
+              :class="{ 'is-invalid': errors['address'] }" placeholder="請輸入詳細地址" rules="required"
+              :value="backupData.addressDetail" />
+            <VeeErrorMessage name="addressDetail">
+              <span class="text-danger">地址為必填</span>
+            </VeeErrorMessage>
           </div>
         </div>
-
-        <div class="form-check d-flex align-items-end gap-2 mb-10 text-neutral-0">
-          <input id="agreementCheck" class="form-check-input" type="checkbox" value="">
-          <label class="form-check-label fw-bold" for="agreementCheck">
-            我已閱讀並同意本網站個資使用規範
-          </label>
+        <div class="mb-10">
+          <div class="form-check d-flex align-items-end gap-2 text-neutral-0">
+            <VeeField name="agreementCheck" id="agreementCheck" class="form-check-input" type="checkbox"
+              rules="required" value="true" />
+            <label class="form-check-label fw-bold" for="agreementCheck">
+              我已閱讀並同意本網站個資使用規範
+            </label>
+          </div>
+          <VeeErrorMessage name="agreementCheck">
+            <span class="text-danger">請閱讀本網站個資使用規範</span>
+          </VeeErrorMessage>
         </div>
-        <button class="btn btn-primary-100 w-100 py-4 text-neutral-0 fw-bold" type="button">
+
+        <button class="btn btn-primary-100 w-100 py-4 text-neutral-0 fw-bold" type="submit" :disabled="!meta.valid">
           完成註冊
         </button>
-      </form>
+      </VeeForm>
     </div>
 
     <p class="mb-0 fs-8 fs-md-7">
@@ -159,18 +373,7 @@ const isEmailAndPasswordValid = ref(false);
 </template>
 
 <style lang="scss" scoped>
-@import "bootstrap/scss/mixins/breakpoints";
-
-$grid-breakpoints: (
-  xs: 0,
-  sm: 576px,
-  md: 768px,
-  lg: 992px,
-  xl: 1200px,
-  xxl: 1400px,
-  xxxl: 1537px
-);
-
+@import "@/assets/stylesheets/page/breakpoints";
 
 input[type="password"] {
   font: small-caption;
