@@ -1,7 +1,6 @@
 import { checkLogin } from "@/api/checkLogin";
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
-  console.log(to.name);
   const redirectPath = "/account/login";
   const config = useRuntimeConfig();
   const cookieToken = useCookie(config.public.cookieToken);
@@ -11,6 +10,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     "user-userId-profile",
     "user-userId-order",
     "rooms-roomId-booking",
+    "booking-confirmation-bookingId",
   ];
 
   if (isNeedAuth.includes(to.name as string)) {
