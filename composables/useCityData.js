@@ -53,6 +53,18 @@ export const useCityData = () => {
     },
   });
 
+  const zipCodeToCity = {};
+  const cityList = Object.keys(cityZoneList.value);
+  cityList.forEach((city) => {
+    cityZoneList.value[city].zones.forEach((zone, zoneIndex) => {
+      zipCodeToCity[zone.zipCode] = {
+        city,
+        zone: zone.name,
+        zoneIndex,
+      };
+    });
+  });
+
   const cityDefault = ref("Taipei");
   const zoneOptions = ref([]);
 
@@ -61,10 +73,13 @@ export const useCityData = () => {
     zoneOptions.value = zones;
   };
 
+  const getCityInfo = (zipCode) => zipCodeToCity[zipCode];
+
   return {
     cityZoneList,
     cityDefault,
     zoneOptions,
     setZones,
+    getCityInfo,
   };
 };
