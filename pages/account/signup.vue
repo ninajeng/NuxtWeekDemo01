@@ -72,69 +72,16 @@ const checkCalender = () => {
   }
 }
 
-const cityZoneList = ref({
-  Taipei: {
-    name: '臺北市',
-    zones: [
-      {
-        name: '中山區',
-        zipCode: 104
-      },
-      {
-        name: '松山區',
-        zipCode: 105
-      },
-      {
-        name: '信義區',
-        zipCode: 110
-      }
-    ]
-  },
-  Taichung: {
-    name: '臺中市',
-    zones: [
-      {
-        name: '中區',
-        zipCode: 400
-      },
-      {
-        name: '豐原區',
-        zipCode: 420
-      },
-      {
-        name: '大甲區',
-        zipCode: 437
-      }
-    ]
-  },
-  Kaohsiung: {
-    name: '高雄市',
-    zones: [
-      {
-        name: '前金區',
-        zipCode: 801
-      },
-      {
-        name: '鹽埕區',
-        zipCode: 803
-      },
-      {
-        name: '新興區',
-        zipCode: 800
-      }
-    ]
-  },
-})
-const zoneOptions = ref([]);
-const cityDefault = ref('Taipei')
-const resetZones = (city) => {
-  const zones = cityZoneList.value[city].zones.map(zone => zone.name)
-  zoneOptions.value = zones;
-  if (zoneSelect.value) {
+const { cityZoneList, cityDefault, zoneOptions,setZones } = useCityData();
+
+setZones(cityDefault.value)
+
+const resetZoneSelect = (city) => {
+  setZones(city);
+  if(zoneSelect.value) {
     zoneSelect.value.value = 0;
   }
 }
-resetZones(cityDefault.value)
 
 const register = async (inputValue) => {
   const { name, phone, year, month, date, city, zoneIndex, addressDetail: detail } = inputValue
@@ -324,7 +271,7 @@ const register = async (inputValue) => {
           <div>
             <div class="d-flex gap-2 mb-2">
               <VeeField name="city" class="form-select p-4 text-neutral-80 fw-medium rounded-3" ref="citySelect"
-                as="select" :value="backupData.city || cityDefault" @change="resetZones($event.target.value)">
+                as="select" :value="backupData.city || cityDefault" @change="resetZoneSelect($event.target.value)">
                 <option :value="cityName" v-for="(cityInfo, cityName) in cityZoneList" :key="`city-${cityName}`">
                   {{ cityInfo.name }}
                 </option>
@@ -337,7 +284,7 @@ const register = async (inputValue) => {
               </VeeField>
             </div>
             <VeeField name="addressDetail" id="address" type="text" class="form-control p-4 rounded-3 mb-1"
-              :class="{ 'is-invalid': errors['address'] }" placeholder="請輸入詳細地址" rules="required"
+              :class="{ 'is-invalid': errors['addressDetail'] }" placeholder="請輸入詳細地址" rules="required"
               :value="backupData.addressDetail" />
             <VeeErrorMessage name="addressDetail">
               <span class="text-danger">地址為必填</span>
