@@ -9,8 +9,6 @@ export const getOrderInfo = async (orderId: string, token: string) => {
     });
     return response;
   } catch (error) {
-    console.dir(error);
-
     const errorRes = error as {
       status: number;
       response?: {
