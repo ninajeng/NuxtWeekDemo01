@@ -5,7 +5,6 @@ import { bookingRoom } from '@/api/bookingRoom';
 
 const route = useRoute();
 const { roomId } = route.params;
-console.log(roomId)
 
 const { formatNumber } = useFormatNumber()
 
@@ -15,8 +14,21 @@ const bookingStore = useBookingStore()
 const { bookingBackup } = storeToRefs(bookingStore);
 
 const config = useRuntimeConfig();
-const cookieToken = useCookie(config.public.cookieToken);
-const token = cookieToken.value;
+const token = useCookie(config.public.cookieToken).value;
+
+const { cityZoneList, cityDefault, zoneOptions,setZones } = useCityData();
+setZones(cityDefault.value)
+const resetZoneSelect = (city) => {
+  setZones(city);
+  if(zoneSelect.value) {
+    zoneSelect.value.value = 0;
+  }
+}
+
+// DOM
+const alertDialog = ref(null)
+const contactForm = ref(null)
+const zoneSelect = ref(null)
 
 const order = ref({})
 const roomInfo = ref({})
@@ -24,6 +36,13 @@ const checkInDateText = ref('');
 const checkOutDateText = ref('');
 const daysCount = ref(0)
 const dayAppendix = ['日', '一', '二', '三', '四', '五', '六']
+const contactData = ref({
+  city: cityDefault.value,
+  zoneIndex: 1,
+})
+
+const phoneRegex = new RegExp('^09\\d{8}$');
+const checkPhone = (phone) => phoneRegex.test(phone);
 
 const formateDateText = (dateText) => {
   if(!dateText) return;
@@ -42,7 +61,6 @@ const countDay = (endDate, startDay) => {
 }
 
 if(!bookingBackup.value.order){
-  console.log('???')
   await navigateTo(`/rooms/${roomId}`);
 }else{
   order.value = bookingBackup.value.order
@@ -51,8 +69,8 @@ if(!bookingBackup.value.order){
   checkInDateText.value = formateDateText(order.value.checkInDate)
   checkOutDateText.value = formateDateText(order.value.checkOutDate)
   daysCount.value = countDay(order.value.checkOutDate, order.value.checkInDate)
-  console.log(daysCount)
 }
+
 
 const goBack = async () => {
   await navigateTo(`/rooms/${roomId}`)
@@ -60,23 +78,52 @@ const goBack = async () => {
 
 const isLoading = ref(false);
 
-const confirmBooking = () => {
-  isLoading.value = true;
+const confirmBooking = async () => {
+  const { valid: isValid } = await contactForm.value.validate()
+  if(!isValid) return
 
-  setTimeout(async () => {
+  const { name, phone, email, city, zoneIndex , addressDetail: detail} = contactData.value
+  const zipcode = cityZoneList.value[city].zones[zoneIndex].zipCode;
+  const data = {
+    ...order.value,
+    userInfo: {
+      name,
+      phone,
+      email,
+      address: {
+        zipcode,
+        detail
+      },
+    }
+  }
+
+  isLoading.value = true;
+  const { status, result, message: errorMessage } = await bookingRoom(data, token)
+
+  if(!status) {
     isLoading.value = false;
-    await navigateTo({
-      name: 'booking-confirmation-bookingId',
-      params: {
-        bookingId: 'HH2302183151222'
-      }
-    })
-  }, 1500);
+    if (errorMessage) {
+      alertDialog.value.showErrorMessage({message: errorMessage})
+    }else{
+      alertDialog.value.showErrorMessage()
+    }
+    return
+  }
+
+  await navigateTo({
+    name: 'booking-confirmation-bookingId',
+    params: {
+      bookingId: result._id
+    }
+  })
 }
 
 </script>
 
 <template>
+  <ClientOnly>
+    <AppAlert ref="alertDialog" />
+  </ClientOnly>
   <main class="pt-18 pt-md-30 bg-neutral-120">
     <section class="py-10 py-md-30 bg-primary-10">
       <div class="container">
@@ -129,7 +176,7 @@ const confirmBooking = () => {
                       房客人數
                     </h3>
                     <p class="mb-0 fw-medium">
-                      2 人
+                      {{ `${order.peopleNum} 人` }}
                     </p>
                   </div>
                   <button class="bg-transparent border-0 fw-bold text-decoration-underline" type="button">
@@ -152,51 +199,63 @@ const confirmBooking = () => {
                 </button>
               </div>
 
-              <div class="d-flex flex-column gap-6">
+              <VeeForm v-slot="{ errors }" class="d-flex flex-column gap-6" ref="contactForm">
                 <div class="text-neutral-100">
                   <label for="name" class="form-label fs-8 fs-md-7 fw-bold">姓名</label>
-                  <input id="name" type="text" class="form-control p-4 fs-8 fs-md-7 rounded-3" placeholder="請輸入姓名">
+                  <VeeField name="name" id="name" type="text" class="form-control p-4 fs-8 fs-md-7 rounded-3 mb-1"
+                    :class="{ 'is-invalid': errors.name }" rules="required|min:2" placeholder="請輸入姓名"
+                    v-model="contactData.name" />
+                  <VeeErrorMessage name="name">
+                    <span class="text-danger">姓名需至少 2 個字</span>
+                  </VeeErrorMessage>
                 </div>
 
                 <div class="text-neutral-100">
                   <label for="phone" class="form-label fs-8 fs-md-7 fw-bold">手機號碼</label>
-                  <input id="phone" type="tel" class="form-control p-4 fs-8 fs-md-7 rounded-3" placeholder="請輸入手機號碼">
+                  <VeeField name="phone" id="phone" type="tel" class="form-control p-4 fs-8 fs-md-7 rounded-3 mb-1"
+                    :class="{ 'is-invalid': errors.phone }" :rules="checkPhone" placeholder="請輸入手機號碼"
+                    v-model="contactData.phone" />
+                  <VeeErrorMessage name="phone">
+                    <span class="text-danger">手機格式不正確</span>
+                  </VeeErrorMessage>
                 </div>
 
                 <div class="text-neutral-100">
                   <label for="email" class="form-label fs-8 fs-md-7 fw-bold">電子信箱</label>
-                  <input id="email" type="email" class="form-control p-4 fs-8 fs-md-7 rounded-3" placeholder="請輸入電子信箱">
+                  <VeeField name="email" id="email" type="email" class="form-control p-4 fs-8 fs-md-7 rounded-3 mb-1"
+                    :class="{ 'is-invalid': errors.email }" rules="required|email" placeholder="請輸入電子信箱"
+                    v-model="contactData.email" />
+                  <VeeErrorMessage name="email">
+                    <span class="text-danger">電子信箱格式不正確</span>
+                  </VeeErrorMessage>
                 </div>
 
                 <div class="text-neutral-100">
                   <label for="address" class="form-label fs-8 fs-md-7 fw-bold">地址</label>
                   <div className="d-flex gap-2 mb-4">
-                    <select class="form-select w-50 p-4 text-neutral-80 fs-8 fs-md-7 fw-medium rounded-3">
-                      <option value="臺北市">
-                        臺北市
+                    <VeeField name="city" class="form-select w-50 p-4 text-neutral-80 fs-8 fs-md-7 fw-medium rounded-3"
+                      ref="citySelect" as="select" v-model="contactData.city"
+                      @change="resetZoneSelect($event.target.value)">
+                      <option :value="cityName" v-for="(cityInfo, cityName) in cityZoneList" :key="`city-${cityName}`">
+                        {{ cityInfo.name }}
                       </option>
-                      <option value="臺中市">
-                        臺中市
+                    </VeeField>
+                    <VeeField name="zoneIndex"
+                      class="form-select w-50 p-4 text-neutral-80 fs-8 fs-md-7 fw-medium rounded-3" ref="zoneSelect"
+                      as="select" v-model="contactData.zoneIndex">
+                      <option :value="index" v-for="(zone, index) in zoneOptions" :key="`zone-${index}`">
+                        {{ zone }}
                       </option>
-                      <option selected value="高雄市">
-                        高雄市
-                      </option>
-                    </select>
-                    <select class="form-select w-50 p-4 text-neutral-80 fs-8 fs-md-7 fw-medium rounded-3">
-                      <option value="前金區">
-                        前金區
-                      </option>
-                      <option value="鹽埕區">
-                        鹽埕區
-                      </option>
-                      <option selected value="新興區">
-                        新興區
-                      </option>
-                    </select>
+                    </VeeField>
                   </div>
-                  <input id="address" type="text" class="form-control p-4 fs-8 fs-md-7 rounded-3" placeholder="請輸入詳細地址">
+                  <VeeField name="addressDetail" id="address" type="text"
+                    class="form-control p-4 fs-8 fs-md-7 rounded-3 mb-1" :class="{ 'is-invalid': errors.addressDetail }"
+                    placeholder="請輸入詳細地址" rules="required" v-model="contactData.addressDetail" />
+                  <VeeErrorMessage name="addressDetail">
+                    <span class="text-danger">地址為必填</span>
+                  </VeeErrorMessage>
                 </div>
-              </div>
+              </VeeForm>
             </section>
 
             <hr class="my-10 my-md-12 opacity-100 text-neutral-60">
@@ -302,7 +361,7 @@ const confirmBooking = () => {
                     <span class="text-neutral-80">{{ daysCount }} 晚</span>
                   </div>
                   <span class="fw-medium">
-                    {{ `NT$ ${formatNumber(roomInfo.price)}` }}
+                    {{ `NT$ ${formatNumber(roomInfo.price * daysCount)}` }}
                   </span>
                 </div>
                 <!-- <div class="d-flex justify-content-between align-items-center fw-medium">

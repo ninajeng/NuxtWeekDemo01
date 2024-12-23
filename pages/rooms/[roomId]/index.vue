@@ -53,7 +53,6 @@ const handleDateChange = (bookingInfo) => {
 
   bookingPeople.value = bookingInfo.people?.value || 1;
   daysCount.value = bookingInfo.daysCount.value;
-  console.log(bookingDate)
 }
 
 const submit = async () => {
@@ -68,35 +67,16 @@ const submit = async () => {
       alertDialog.value.showErrorMessage(message);
       return
   }
-  // const { address, name, phone, email } = userInfo.value
+
   const order = {
     roomId,
     checkInDate: bookingDate.date.start,
     checkOutDate: bookingDate.date.end,
     peopleNum: bookingPeople.value,
-    // userInfo: {
-    //   address,
-    //   name,
-    //   phone,
-    //   email
-    // }
   }
-  console.log(order)
+
   setBookingBackup({order, roomInfo});
   await navigateTo(`/rooms/${roomId}/booking`);
-  // const { status, result, message: errorMessage } = await booking(order);
-
-  // if (!status) {
-  //   if (errorMessage) {
-  //     alertDialog.value.showErrorMessage({ message: errorMessage })
-  //   } else {
-  //     alertDialog.value.showErrorMessage()
-  //   }
-  //   return
-  // }
-
-  // BOOKING_URL
-
 }
 
 
