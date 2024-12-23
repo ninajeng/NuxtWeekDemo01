@@ -16,3 +16,4 @@ export const USERINFO_URL = `${BASE_URL}/api/v1/user`;
 export const ORDER_URL = `${BASE_URL}/api/v1/orders`;
 export const ORDER_LIST_URL = `${BASE_URL}/api/v1/orders`;
 export const BOOKING_URL = `${BASE_URL}/api/v1/orders`;
+export const DELETE_ORDER_URL = `${BASE_URL}/api/v1/orders`;
