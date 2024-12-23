@@ -26,7 +26,7 @@ const alertDialog = Swal.mixin({
   allowOutsideClick: false
 })
 
-function showSuccessMessage ({title, message, showCancelButton, confirmButtonText, timer, replacePath = null} = {}) {
+function showSuccessMessage ({title, message, showCancelButton, confirmButtonText, timer, replacePath = null, reloadPage = false} = {}) {
   alertDialog.fire({
     title: title || successDefaultText.title,
     text: message || successDefaultText.message,
@@ -35,9 +35,13 @@ function showSuccessMessage ({title, message, showCancelButton, confirmButtonTex
     confirmButtonText: confirmButtonText || buttonDefaultText.confirm,
     timer: timer || 0,
   }).then(async({isConfirmed, dismiss}) => {
-    if(!replacePath) return;
+    if(!replacePath && !reloadPage) return;
     if(isConfirmed || dismiss === 'timer'){
-      await navigateTo(replacePath);
+      if(reloadPage) {
+        window.location.reload()
+      }else{
+        await navigateTo(replacePath);
+      }
     }
   })
 }
