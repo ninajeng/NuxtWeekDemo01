@@ -122,18 +122,7 @@ const submit = async (inputValue) => {
 </template>
 
 <style lang="scss" scoped>
-@import "bootstrap/scss/mixins/breakpoints";
-
-$grid-breakpoints: (
-  xs: 0,
-  sm: 576px,
-  md: 768px,
-  lg: 992px,
-  xl: 1200px,
-  xxl: 1400px,
-  xxxl: 1537px
-);
-
+@import "@/assets/stylesheets/page/breakpoints";
 
 input[type="password"] {
   font: small-caption;
