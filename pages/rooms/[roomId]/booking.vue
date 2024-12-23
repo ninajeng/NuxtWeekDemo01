@@ -17,7 +17,7 @@ const { bookingBackup } = storeToRefs(bookingStore);
 const config = useRuntimeConfig();
 const token = useCookie(config.public.cookieToken).value;
 
-const { cityZoneList, cityDefault, zoneOptions,setZones } = useCityData();
+const { cityZoneList, cityDefault, zoneOptions, setZones, getCityInfo } = useCityData();
 setZones(cityDefault.value)
 const resetZoneSelect = (city) => {
   setZones(city);
@@ -55,9 +55,15 @@ if(!bookingBackup.value.order){
   daysCount.value = countDay(order.value.checkOutDate, order.value.checkInDate)
 }
 
-
 const goBack = async () => {
   await navigateTo(`/rooms/${roomId}`)
+}
+
+const useUserInfo = () => {
+  const {city, zoneIndex} = getCityInfo(userInfo.value.address.zipcode);
+  const addressDetail = userInfo.value.address.detail;
+  contactData.value = {...userInfo.value, city, zoneIndex, addressDetail};
+  resetZoneSelect(city);
 }
 
 const isLoading = ref(false);
@@ -177,8 +183,8 @@ const confirmBooking = async () => {
                 <h2 class="mb-0 text-neutral-100 fs-6 fs-md-4 fw-bold">
                   訂房人資訊
                 </h2>
-                <button class="text-primary-100 bg-transparent border-0 fw-bold text-decoration-underline"
-                  type="button">
+                <button class="text-primary-100 bg-transparent border-0 fw-bold text-decoration-underline" type="button"
+                  @click="useUserInfo">
                   套用會員資料
                 </button>
               </div>
