@@ -23,30 +23,27 @@ const dayCount = ref(0);
 // DOM
 const alertDialog = ref(null)
 
-if(import.meta.client) {
-  const { status, result, message: errorMessage } = await getOrderInfo(bookingId, token);
-  if(!status) {
-    const alertMessage = {
-      replacePath: '/rooms'
-    }
-    if (errorMessage) {
-      alertDialog.value.showErrorMessage({ 
-        message: errorMessage, ...alertMessage  })
-    }else{
-      alertDialog.value.showErrorMessage(alertMessage)
-    }
-  }else{
+const { status, result, message: errorMessage } = await getOrderInfo(bookingId, token);
+if(status) {
     startDate.value = result.checkInDate.split('T')[0];
     endDate.value = result.checkOutDate.split('T')[0];
     dayCount.value = countDay(startDate.value, endDate.value)
     orderInfo.value = result
-  }
 }
+onMounted(()=>{
+  if(!status) {
+    const alertMessage = {
+      message: '查無訂單' || errorMessage,
+      replacePath: '/rooms'
+    }
+    alertDialog.value.showErrorMessage(alertMessage)
+  }
+})
 </script>
 
 <template>
+  <AppAlert ref="alertDialog" />
   <ClientOnly>
-    <AppAlert ref="alertDialog" />
     <main class="overflow-hidden pt-18 pt-md-30 bg-neutral-120">
       <div class="container py-10 py-md-30" v-if="orderInfo._id">
         <div class="row gap-15 gap-md-0">
@@ -232,7 +229,7 @@ $grid-breakpoints: (
 }
 
 .flex-item {
-  flex: 1 1 25%;
+  flex: 1 1 26%;
   white-space: nowrap;
 
   @include media-breakpoint-down(md) {
