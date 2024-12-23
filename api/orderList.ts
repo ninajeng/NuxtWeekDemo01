@@ -1,13 +1,11 @@
-import { BOOKING_URL } from "./apiUrls";
+import { ORDER_LIST_URL } from "./apiUrls";
 
-export const bookingRoom = async (order: object, token: string) => {
+export const getOrderList = async (token: string) => {
   try {
-    const response = await $fetch(BOOKING_URL, {
-      method: "post",
+    const response = await $fetch(ORDER_LIST_URL, {
       headers: {
         authorization: token,
       },
-      body: { ...order },
     });
     return response;
   } catch (error) {
