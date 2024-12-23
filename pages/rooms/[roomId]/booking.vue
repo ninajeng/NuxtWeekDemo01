@@ -7,6 +7,7 @@ const route = useRoute();
 const { roomId } = route.params;
 
 const { formatNumber } = useFormatNumber()
+const { countDay } = useDayNum()
 
 const userStore = useUserStore();
 const { userInfo } = storeToRefs(userStore);
@@ -35,7 +36,6 @@ const roomInfo = ref({})
 const checkInDateText = ref('');
 const checkOutDateText = ref('');
 const daysCount = ref(0)
-const dayAppendix = ['日', '一', '二', '三', '四', '五', '六']
 const contactData = ref({
   city: cityDefault.value,
   zoneIndex: 1,
@@ -44,30 +44,14 @@ const contactData = ref({
 const phoneRegex = new RegExp('^09\\d{8}$');
 const checkPhone = (phone) => phoneRegex.test(phone);
 
-const formateDateText = (dateText) => {
-  if(!dateText) return;
-  const dateObj = new Date(dateText)
-  const month = dateObj.getMonth() + 1;
-  const date = dateObj.getDate();
-  const day = dayAppendix[dateObj.getDay()];
-  return `${month}月${date}日星期${day}`
-}
-
-const countDay = (endDate, startDay) => {
-  if(!endDate || !startDay) return
-  const end = new Date(endDate)
-  const start = new Date(startDay)
-  return parseInt(Math.abs(end - start) / 1000 / 60 / 60 / 24)
-}
-
 if(!bookingBackup.value.order){
   await navigateTo(`/rooms/${roomId}`);
 }else{
   order.value = bookingBackup.value.order
   roomInfo.value = bookingBackup.value.roomInfo
 
-  checkInDateText.value = formateDateText(order.value.checkInDate)
-  checkOutDateText.value = formateDateText(order.value.checkOutDate)
+  checkInDateText.value = order.value.checkInDate
+  checkOutDateText.value = order.value.checkOutDate
   daysCount.value = countDay(order.value.checkOutDate, order.value.checkInDate)
 }
 
@@ -160,10 +144,10 @@ const confirmBooking = async () => {
                       訂房日期
                     </h3>
                     <p class="mb-2 fw-medium">
-                      入住：{{ checkInDateText }}
+                      入住：<span v-dayFormat="checkInDateText"></span>
                     </p>
                     <p class="mb-0 fw-medium">
-                      退房：{{ checkOutDateText }}
+                      退房：<span v-dayFormat="checkOutDateText"></span>
                     </p>
                   </div>
                   <button class="bg-transparent border-0 fw-bold text-decoration-underline" type="button">
