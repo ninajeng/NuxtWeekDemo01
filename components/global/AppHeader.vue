@@ -4,7 +4,7 @@ import { Icon } from '@iconify/vue';
 import { getUserInfo } from "@/api/userInfo";
 const userStore = useUserStore();
 const { setUserInfo } = userStore;
-const { userName } = storeToRefs(userStore)
+const { userName, userId } = storeToRefs(userStore)
 
 const config = useRuntimeConfig();
 const cookieToken = useCookie(config.public.cookieToken);
@@ -80,7 +80,7 @@ onUnmounted(() => {
                     </button>
                     <ul class="dropdown-menu py-3 overflow-hidden" style="right: 0; left: auto; border-radius: 20px;">
                       <li>
-                        <NuxtLink to="/user/1/profile" class="dropdown-item px-6 py-4">
+                        <NuxtLink :to="`/user/${userId}/profile`" class="dropdown-item px-6 py-4">
                           我的帳戶
                         </NuxtLink>
                       </li>
@@ -91,7 +91,7 @@ onUnmounted(() => {
                   </div>
                 </li>
                 <li class="d-md-none nav-item">
-                  <NuxtLink to="/user/1/profile" class="nav-link p-4 text-neutral-0">
+                  <NuxtLink :to="`/user/${userId}/profile`" class="nav-link p-4 text-neutral-0">
                     我的帳戶
                   </NuxtLink>
                 </li>
