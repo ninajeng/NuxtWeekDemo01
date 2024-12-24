@@ -128,11 +128,11 @@ onMounted(()=>{
                   </p>
                 </h3>
                 <div class="text-neutral-80 fs-8 fs-md-7 fw-bold">
-                  <p class="title-deco mb-2">
-                    入住：<span v-dayFormat="startDate"></span>，15:00 可入住
+                  <p class="title-deco mb-2" v-dayFormat="startDate">
+                    入住：[day]，15:00 可入住
                   </p>
-                  <p class="title-deco mb-0">
-                    退房：<span v-dayFormat="endDate"></span>，12:00 前退房
+                  <p class="title-deco mb-0" v-dayFormat="endDate">
+                    退房：[day]，12:00 前退房
                   </p>
                 </div>
 

@@ -149,11 +149,11 @@ const confirmBooking = async () => {
                     <h3 class="title-deco mb-2 fs-7 fw-bold">
                       訂房日期
                     </h3>
-                    <p class="mb-2 fw-medium">
-                      入住：<span v-dayFormat="checkInDateText"></span>
+                    <p class="mb-2 fw-medium" v-dayFormat="checkInDateText">
+                      入住：[day]，15:00 可入住
                     </p>
-                    <p class="mb-0 fw-medium">
-                      退房：<span v-dayFormat="checkOutDateText"></span>
+                    <p class="mb-0 fw-medium" v-dayFormat="checkOutDateText">
+                      退房：[day]，12:00 前退房
                     </p>
                   </div>
                   <button class="bg-transparent border-0 fw-bold text-decoration-underline" type="button">
