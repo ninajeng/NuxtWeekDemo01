@@ -59,6 +59,7 @@ export const useCityData = () => {
     cityZoneList.value[city].zones.forEach((zone, zoneIndex) => {
       zipCodeToCity[zone.zipCode] = {
         city,
+        cityName: cityZoneList.value[city].name,
         zone: zone.name,
         zoneIndex,
       };
@@ -73,7 +74,7 @@ export const useCityData = () => {
     zoneOptions.value = zones;
   };
 
-  const getCityInfo = (zipCode) => zipCodeToCity[zipCode];
+  const getCityInfo = (zipCode) => zipCodeToCity[zipCode] || zipCodeToCity[104];
 
   return {
     cityZoneList,
