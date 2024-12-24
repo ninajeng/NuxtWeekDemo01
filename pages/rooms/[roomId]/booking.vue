@@ -59,6 +59,10 @@ const goBack = async () => {
   await navigateTo(`/rooms/${roomId}`)
 }
 
+const goRoomList = async () => {
+  await navigateTo(`/rooms`)
+}
+
 const useUserInfo = () => {
   const {city, zoneIndex} = getCityInfo(userInfo.value.address.zipcode);
   const addressDetail = userInfo.value.address.detail;
@@ -140,7 +144,8 @@ const confirmBooking = async () => {
                       {{ roomInfo.name }}
                     </p>
                   </div>
-                  <button class="bg-transparent border-0 fw-bold text-decoration-underline" type="button">
+                  <button class="bg-transparent border-0 fw-bold text-decoration-underline" type="button"
+                    @click="goRoomList">
                     編輯
                   </button>
                 </div>
@@ -156,7 +161,8 @@ const confirmBooking = async () => {
                       退房：[day]，12:00 前退房
                     </p>
                   </div>
-                  <button class="bg-transparent border-0 fw-bold text-decoration-underline" type="button">
+                  <button class="bg-transparent border-0 fw-bold text-decoration-underline" type="button"
+                    @click="goBack">
                     編輯
                   </button>
                 </div>
@@ -169,7 +175,8 @@ const confirmBooking = async () => {
                       {{ `${order.peopleNum} 人` }}
                     </p>
                   </div>
-                  <button class="bg-transparent border-0 fw-bold text-decoration-underline" type="button">
+                  <button class="bg-transparent border-0 fw-bold text-decoration-underline" type="button"
+                    @click="goBack">
                     編輯
                   </button>
                 </div>

@@ -8,8 +8,10 @@ const alertDialog = ref(null)
 
 const userStore = useUserStore();
 const { userInfo } = storeToRefs(userStore);
+
 const bookingStore = useBookingStore()
-const { setBookingBackup } = bookingStore
+const { setBookingBackup } = bookingStore;
+const { bookingBackup } = storeToRefs(bookingStore);
 
 const { formatNumber } = useFormatNumber();
 const route = useRoute();
@@ -24,7 +26,7 @@ const openModal = () => {
 }
 
 const MAX_BOOKING_PEOPLE = roomInfo.value.maxPeople;
-const bookingPeople = ref(1);
+const bookingPeople = ref(bookingBackup.value.order?.peopleNum || 1);
 const daysCount = ref(0);
 
 const daysFormatOnMobile = (date) => date?.split('-').slice(1, 3).join(' / ');
@@ -39,8 +41,8 @@ const currentDate = new Date();
 
 const bookingDate = reactive({
   date: {
-    start: formatDate(currentDate),
-    end: null,
+    start: bookingBackup.value.order?.checkInDate || formatDate(currentDate),
+    end: bookingBackup.value.order?.checkOutDate || null,
   },
   minDate: new Date(),
   maxDate: new Date(currentDate.setFullYear(currentDate.getFullYear() + 1))
@@ -339,8 +341,8 @@ const submit = async () => {
           <div class="d-flex flex-column gap-1">
             <small class="text-neutral-80 fw-medium">{{ `NT$ ${formatNumber(roomInfo.price)} / ${daysCount} 晚 /
               ${bookingPeople} 人` }}</small>
-            <span class="text-neutral fs-9 fw-medium text-decoration-underline">{{
-              daysFormatOnMobile(bookingDate.date?.start) }} - {{ daysFormatOnMobile(bookingDate.date?.end) }}</span>
+            <a class="link-dark fs-9 fw-medium" role="button" @click="openModal">{{
+              daysFormatOnMobile(bookingDate.date?.start) }} - {{ daysFormatOnMobile(bookingDate.date?.end) }}</a>
           </div>
           <button class="btn btn-primary-100 px-12 py-4 text-neutral-0 fw-bold rounded-3" type="button" @click="submit">
             立即預訂
