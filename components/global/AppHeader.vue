@@ -46,7 +46,9 @@ onUnmounted(() => {
 // DOM
 const navButton = ref(null)
 const closeCollapse = () => {
-  navButton.value.click()
+  if(![...navButton.value.classList].includes('collapsed')){
+    navButton.value.click()
+  }
 }
 
 </script>
