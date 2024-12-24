@@ -73,10 +73,10 @@ const submitProfile = (inputValue) => {
       detail
     }
   }
-  updateData(newData)
+  updateData(newData, isEditProfile)
 }
 
-const updateData = async (data) => {
+const updateData = async (data, isEditStatus) => {
   const { status, message: errorMessage } = await updateUserInfo(data, token);
 
   if (!status) {
@@ -97,6 +97,10 @@ const updateData = async (data) => {
     reloadPage: true
   }
   alertDialog.value.showSuccessMessage(message)
+
+  if(isEditStatus){
+    isEditStatus.value = false
+  }
 }
 
 const submitPassword = () => {
@@ -107,7 +111,7 @@ const submitPassword = () => {
     oldPassword,
     newPassword
   }
-  updateData(newData)
+  updateData(newData, isEditPassword)
 }
 </script>
 
