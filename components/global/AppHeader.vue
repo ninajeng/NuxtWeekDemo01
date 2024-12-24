@@ -21,7 +21,8 @@ if(cookieToken.value) {
 
 const logout = () => {
   cookieToken.value = ''
-  setUserInfo()
+  setUserInfo();
+  closeCollapse();
 }
 
 const route = useRoute();
