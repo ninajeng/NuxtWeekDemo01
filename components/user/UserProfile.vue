@@ -107,24 +107,7 @@ const submitPassword = () => {
     oldPassword,
     newPassword
   }
-  console.log(newData)
   updateData(newData)
-
-//   {
-//   "userId": "6523e9fc3a22dd8d8207ef80",
-//   "name": "Kylie Stanley",
-//   "phone": "(937) 233-2482",
-//   "birthday": "1948/6/5",
-//   "address": {
-//     "zipcode": 802,
-//     "detail": "文山路23號"
-//   },
-//   "oldPassword": "舊密碼",
-//   "newPassword": "新密碼"
-// }
-
-
-
 }
 </script>
 
