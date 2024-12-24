@@ -104,8 +104,8 @@ const cancelOrder = async () => {
   <AppAlert ref="alertDialog" />
   <RoomsBookingLoading v-if="isLoading" />
   <ClientOnly>
-    <div class="row gap-6 gap-md-0" v-if="orderList.length">
-      <div class="col-12 col-md-7 flex-fill" v-if="comingOrders.length">
+    <div class="row gap-6 gap-md-0" v-if="comingOrders.length || finishedOrders_show.length">
+      <div class="col-12 col-md-7" v-if="comingOrders.length">
         <div class="rounded-3xl d-flex flex-column gap-6 gap-md-10 p-4 p-md-10 bg-neutral-0" style="max-width: 730px;">
           <template v-for="(order, index) in comingOrders" :key="order._id">
             <div>
@@ -131,11 +131,11 @@ const cancelOrder = async () => {
               </h3>
 
               <div class="text-neutral-80 fs-8 fs-md-7 fw-bold">
-                <p class="title-deco mb-2">
-                  入住：<span v-dayFormat="order.checkInDate"></span>，15:00 可入住
+                <p class="title-deco mb-2" v-dayFormat="order.checkInDate">
+                  入住：[day]，15:00 可入住
                 </p>
-                <p class="title-deco mb-0">
-                  退房：<span v-dayFormat="order.checkOutDate"></span>，12:00 前退房
+                <p class="title-deco mb-0" v-dayFormat="order.checkOutDate">
+                  退房：[day]，12:00 前退房
                 </p>
               </div>
 
@@ -199,56 +199,57 @@ const cancelOrder = async () => {
           </template>
         </div>
       </div>
-      <div class="col-12 col-md-5 flex-fill" v-if=finishedOrders_show.length>
+      <div class="col-12 col-md-5 flex-fill">
         <div class="rounded-3xl d-flex flex-column gap-6 gap-md-10 p-4 p-md-10 bg-neutral-0">
           <h2 class="mb-0 text-neutral-100 fs-7 fs-md-5 fw-bold">
             歷史訂單
           </h2>
-
-          <template v-for="(order, index) in finishedOrders_show" :key="order._id">
-            <div class="d-flex flex-column flex-lg-row gap-6">
-              <img class="img-fluid object-fit-cover rounded-3" style="max-width: 120px; height: 80px;"
-                :src="order.roomId.imageUrl" :alt="order.roomId.name">
-              <section class="d-flex flex-column gap-4">
-                <p class="mb-0 text-neutral-80 fs-8 fs-md-7 fw-medium">
-                  {{ `預訂參考編號： ${order._id}` }}
-                </p>
-
-                <h3 class="d-flex align-items-center mb-0 text-neutral-80 fs-8 fs-md-6 fw-bold">
-                  {{ order.roomId.name }}
-                </h3>
-
-                <div class="text-neutral-80 fw-medium">
-                  <p class="mb-2">
-                    {{ `住宿天數： ${order.dayCount} 晚` }}
+          <p v-if="!finishedOrders_show.length">尚無歷史訂單</p>
+          <template v-else>
+            <template v-for="(order, index) in finishedOrders_show" :key="order._id">
+              <div class="d-flex flex-column flex-lg-row gap-6">
+                <img class="img-fluid object-fit-cover rounded-3" style="max-width: 120px; height: 80px;"
+                  :src="order.roomId.imageUrl" :alt="order.roomId.name">
+                <section class="d-flex flex-column gap-4">
+                  <p class="mb-0 text-neutral-80 fs-8 fs-md-7 fw-medium">
+                    {{ `預訂參考編號： ${order._id}` }}
                   </p>
-                  <p class="mb-0">
-                    {{ `住宿人數：${order.peopleNum} 位` }}
-                  </p>
-                </div>
 
-                <div class="text-neutral-80 fs-8 fs-md-7 fw-medium">
-                  <p class="title-deco mb-2">
-                    入住：<span v-dayFormat="order.checkInDate"></span>，15:00 可入住
-                  </p>
-                  <p class="title-deco mb-0">
-                    退房：<span v-dayFormat="order.checkOutDate"></span>，12:00 前退房
-                  </p>
-                </div>
-                <p class="mb-0 text-neutral-80 fs-8 fs-md-7 fw-bold">
-                  {{ `NT$ ${formatNumber(order.roomId.price * order.dayCount)}` }}
-                </p>
-              </section>
+                  <h3 class="d-flex align-items-center mb-0 text-neutral-80 fs-8 fs-md-6 fw-bold">
+                    {{ order.roomId.name }}
+                  </h3>
 
-            </div>
+                  <div class="text-neutral-80 fw-medium">
+                    <p class="mb-2">
+                      {{ `住宿天數： ${order.dayCount} 晚` }}
+                    </p>
+                    <p class="mb-0">
+                      {{ `住宿人數：${order.peopleNum} 位` }}
+                    </p>
+                  </div>
+                  <div class="text-neutral-80 fs-8 fs-md-7 fw-medium">
+                    <p class="title-deco mb-2" v-dayFormat="order.checkInDate">
+                      入住：[day]，15:00 可入住
+                    </p>
+                    <p class="title-deco mb-0" v-dayFormat="order.checkOutDate">
+                      退房：[day]，12:00 前退房
+                    </p>
+                  </div>
+                  <p class="mb-0 text-neutral-80 fs-8 fs-md-7 fw-bold">
+                    {{ `NT$ ${formatNumber(order.roomId.price * order.dayCount)}` }}
+                  </p>
+                </section>
 
-            <hr class="my-0 opacity-100 text-neutral-40" v-if="index < finishedOrders_show.length - 1">
+              </div>
+
+              <hr class="my-0 opacity-100 text-neutral-40" v-if="index < finishedOrders_show.length - 1">
+            </template>
+
+            <button class="btn btn-outline-primary-100 py-4 fw-bold" style="--bs-btn-hover-color: #fff" type="button"
+              @click="addOrderNum" v-if="!isAllOrders">
+              查看更多
+            </button>
           </template>
-
-          <button class="btn btn-outline-primary-100 py-4 fw-bold" style="--bs-btn-hover-color: #fff" type="button"
-            @click="addOrderNum" v-if="!isAllOrders">
-            查看更多
-          </button>
         </div>
       </div>
     </div>
