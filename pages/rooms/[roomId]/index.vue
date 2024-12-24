@@ -311,13 +311,9 @@ const submit = async () => {
                   </div>
                 </div>
 
-                <h5 class="mb-0 text-primary-100 fw-bold">
-                  {{ `NT$ ${formatNumber(roomInfo.price)}` }}
+                <h5 class="mb- text-primary-100 fw-bold">
+                  {{ `NT$ ${formatNumber(roomInfo.price)} / 晚` }}
                 </h5>
-                <!-- <NuxtLink :to="{ name: 'rooms-roomId-booking', params: { roomId } }"
-                class="btn btn-primary-100 px-12 py-4 text-neutral-0 fw-bold rounded-3">
-                立即預訂
-                </NuxtLink> -->
                 <button class="btn btn-primary-100 px-12 py-4 text-neutral-0 fw-bold rounded-3" type="submit">
                   立即預訂
                 </button>

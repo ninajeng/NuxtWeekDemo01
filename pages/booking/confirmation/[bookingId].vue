@@ -18,7 +18,8 @@ const { formatNumber } = useFormatNumber();
 const orderInfo = ref({});
 const startDate = ref('');
 const endDate = ref('');
-const dayCount = ref(0);
+const daysCount = ref(0);
+const discount = computed(() => daysCount.value * 1000);
 
 // DOM
 const alertDialog = ref(null)
@@ -27,7 +28,7 @@ const { status, result, message: errorMessage } = await getOrderInfo(bookingId, 
 if(status) {
     startDate.value = result.checkInDate.split('T')[0];
     endDate.value = result.checkOutDate.split('T')[0];
-    dayCount.value = countDay(startDate.value, endDate.value)
+    daysCount.value = countDay(startDate.value, endDate.value)
     orderInfo.value = result
 }
 onMounted(()=>{
@@ -120,7 +121,7 @@ onMounted(()=>{
               <section class="d-flex flex-column gap-6">
                 <h3 class="d-flex align-items-center mb-6 text-neutral-80 fs-8 fs-md-6 fw-bold">
                   <p class="mb-0">
-                    {{ `${orderInfo.roomId.name}，${dayCount} 晚` }}
+                    {{ `${orderInfo.roomId.name}，${daysCount} 晚` }}
                   </p>
                   <span class="d-inline-block mx-4 bg-neutral-80" style="width: 1px;height: 18px;" />
                   <p class="mb-0">
@@ -137,7 +138,7 @@ onMounted(()=>{
                 </div>
 
                 <p class="mb-0 text-neutral-80 fs-8 fs-md-7 fw-bold">
-                  {{ `NT$ ${formatNumber(orderInfo.roomId.price * dayCount)}` }}
+                  {{ `NT$ ${formatNumber(orderInfo.roomId.price * daysCount - discount)}` }}
                 </p>
               </section>
 

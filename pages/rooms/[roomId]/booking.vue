@@ -36,6 +36,7 @@ const roomInfo = ref({})
 const checkInDateText = ref('');
 const checkOutDateText = ref('');
 const daysCount = ref(0)
+const discount = computed(() => daysCount.value * 1000);
 const contactData = ref({
   city: cityDefault.value,
   zoneIndex: 1,
@@ -361,21 +362,21 @@ const confirmBooking = async () => {
                     {{ `NT$ ${formatNumber(roomInfo.price * daysCount)}` }}
                   </span>
                 </div>
-                <!-- <div class="d-flex justify-content-between align-items-center fw-medium">
+                <div class="d-flex justify-content-between align-items-center fw-medium">
                   <p class="d-flex align-items-center mb-0 text-neutral-100">
                     住宿折扣
                   </p>
                   <span class="text-primary-100">
-                    -NT$ 1,000
+                    {{ `-NT$ ${formatNumber(discount)}` }}
                   </span>
-                </div> -->
+                </div>
                 <hr class="my-6 opacity-100 text-neutral-40">
                 <div class="d-flex justify-content-between align-items-center text-neutral-100 fw-bold">
                   <p class="d-flex align-items-center mb-0">
                     總價
                   </p>
                   <span>
-                    {{ `NT$ ${formatNumber(roomInfo.price * daysCount)}` }}
+                    {{ `NT$ ${formatNumber(roomInfo.price * daysCount - discount)}` }}
                   </span>
                 </div>
               </div>

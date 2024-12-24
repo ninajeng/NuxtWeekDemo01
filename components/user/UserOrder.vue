@@ -8,6 +8,7 @@ const finishedOrders_show = ref([]);
 const finishedOrders_all = [];
 const showOrderNum = ref(2);
 const addOderNum = 2;
+const discount = ref(1000);
 const isAllOrders = ref(true);
 const isLoading = ref(false);
 
@@ -37,8 +38,8 @@ if(status) {
     const isFinishOrder = new Date() > new Date(order.checkInDate);
     const checkInDate = order.checkInDate.split('T')[0];
     const checkOutDate = order.checkOutDate.split('T')[0];
-    const dayCount = countDay(checkInDate, checkOutDate)
-    const orderInfo = { ...order, checkInDate, checkOutDate, dayCount }
+    const daysCount = countDay(checkInDate, checkOutDate)
+    const orderInfo = { ...order, checkInDate, checkOutDate, daysCount }
     if(isFinishOrder) {
       finishedOrders_all.push(orderInfo)
     }else{
@@ -122,7 +123,7 @@ const cancelOrder = async () => {
             <section class="d-flex flex-column gap-6">
               <h3 class="d-flex align-items-center mb-0 text-neutral-80 fs-8 fs-md-6 fw-bold">
                 <p class="mb-0">
-                  {{ `${order.roomId.name}，${order.dayCount} 晚` }}
+                  {{ `${order.roomId.name}，${order.daysCount} 晚` }}
                 </p>
                 <span class="d-inline-block mx-4 bg-neutral-80" style="width: 1px;height: 18px;" />
                 <p class="mb-0">
@@ -140,7 +141,7 @@ const cancelOrder = async () => {
               </div>
 
               <p class="mb-0 text-neutral-80 fs-8 fs-md-7 fw-bold">
-                {{ `NT$ ${formatNumber(order.roomId.price * order.dayCount)}` }}
+                {{ `NT$ ${formatNumber((order.roomId.price - discount) * order.daysCount)}` }}
               </p>
             </section>
 
@@ -221,7 +222,7 @@ const cancelOrder = async () => {
 
                   <div class="text-neutral-80 fw-medium">
                     <p class="mb-2">
-                      {{ `住宿天數： ${order.dayCount} 晚` }}
+                      {{ `住宿天數： ${order.daysCount} 晚` }}
                     </p>
                     <p class="mb-0">
                       {{ `住宿人數：${order.peopleNum} 位` }}
@@ -236,7 +237,7 @@ const cancelOrder = async () => {
                     </p>
                   </div>
                   <p class="mb-0 text-neutral-80 fs-8 fs-md-7 fw-bold">
-                    {{ `NT$ ${formatNumber(order.roomId.price * order.dayCount)}` }}
+                    {{ `NT$ ${formatNumber((order.roomId.price - discount) * order.daysCount)}` }}
                   </p>
                 </section>
 
