@@ -42,6 +42,13 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll);
 })
+
+// DOM
+const navButton = ref(null)
+const closeCollapse = () => {
+  navButton.value.click()
+}
+
 </script>
 
 <template>
@@ -57,7 +64,7 @@ onUnmounted(() => {
         </NuxtLink>
         <button class="navbar-toggler collapsed p-2 text-white border-0 shadow-none" type="button"
           data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false"
-          aria-label="Toggle navigation">
+          aria-label="Toggle navigation" ref="navButton">
           <Icon class="fs-1" icon="mdi:close" />
           <Icon class="fs-5" icon="mdi:menu" />
         </button>
@@ -66,7 +73,7 @@ onUnmounted(() => {
             <li class="nav-item">
               <NuxtLink :to="{
                 name: 'rooms'
-              }" class="nav-link p-4 text-neutral-0">
+              }" class="nav-link p-4 text-neutral-0" @click="closeCollapse">
                 客房旅宿
               </NuxtLink>
             </li>
@@ -80,7 +87,8 @@ onUnmounted(() => {
                     </button>
                     <ul class="dropdown-menu py-3 overflow-hidden" style="right: 0; left: auto; border-radius: 20px;">
                       <li>
-                        <NuxtLink :to="`/user/${userId}/profile`" class="dropdown-item px-6 py-4">
+                        <NuxtLink :to="`/user/${userId}/profile`" class="dropdown-item px-6 py-4"
+                          @click="closeCollapse">
                           我的帳戶
                         </NuxtLink>
                       </li>
@@ -91,7 +99,7 @@ onUnmounted(() => {
                   </div>
                 </li>
                 <li class="d-md-none nav-item">
-                  <NuxtLink :to="`/user/${userId}/profile`" class="nav-link p-4 text-neutral-0">
+                  <NuxtLink :to="`/user/${userId}/profile`" class="nav-link p-4 text-neutral-0" @click="closeCollapse">
                     我的帳戶
                   </NuxtLink>
                 </li>
@@ -102,7 +110,7 @@ onUnmounted(() => {
                 </li>
               </template>
               <li class="nav-item" v-else>
-                <NuxtLink to="/account/login" class="nav-link p-4 text-neutral-0">
+                <NuxtLink to="/account/login" class="nav-link p-4 text-neutral-0" @click="closeCollapse">
                   會員登入
                 </NuxtLink>
               </li>
@@ -110,7 +118,7 @@ onUnmounted(() => {
             <li class="nav-item">
               <NuxtLink :to="{
                 name: 'rooms'
-              }" class="btn btn-primary-100 px-8 py-4 text-white fw-bold border-0 rounded-3">
+              }" class="btn btn-primary-100 px-8 py-4 text-white fw-bold border-0 rounded-3" @click="closeCollapse">
                 立即訂房
               </NuxtLink>
             </li>
