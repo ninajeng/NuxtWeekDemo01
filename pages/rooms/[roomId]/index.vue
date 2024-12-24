@@ -275,13 +275,6 @@ const submit = async () => {
                       </VeeErrorMessage>
                     </div>
                   </div>
-                  <!-- <div class="form-floating flex-grow-1 flex-shrink-1">
-  <input id="checkoutInput" readonly type="date" :value="bookingDate.date.end"
-    class="form-control p-4 pt-9 text-neutral-100 fw-medium border-neutral-100 rounded-3"
-    style="min-height: 74px;" placeholder="yyyy-mm-dd" @click="openModal">
-  <label class="text-neutral-80 fw-medium" style="top: 8px;left: 8px;" for="checkoutInput">退房
-  </label>
-</div> -->
 
                   <div class="d-flex justify-content-between align-items-center text-neutral-100">
                     <p class="mb-0">
@@ -381,7 +374,6 @@ const submit = async () => {
 }
 
 .flex-item {
-  // flex: 1 1 15%;
   width: calc(100% / 6);
 
   @include media-breakpoint-down(md) {
